@@ -163,12 +163,6 @@ unlink(temp_file)
 # 3.4 Relationship between star and fork #
 ##########################################
 
-# Create a scatter plot
-ggplot(i_df, aes(x = Stars, y = Forks)) +
-  geom_point(color = "blue") +
-  labs(x = "Stars", y = "Forks") +
-  theme_minimal() +
-  ggtitle("Relationship Between Stars and Forks for GitHub Repositories")
 
 
 # Create a scatter plot with a regression line
@@ -181,6 +175,31 @@ ggplot(i_df, aes(x = Stars, y = Forks)) +
 
 
 
+
+#########################
+# 3.5 Most popular tags #
+#########################
+
+# Convert the 'Topics' string to a list
+t_df <- i_df %>% 
+  mutate(Topics = strsplit(Topics, ", ")) %>%
+  unnest(Topics)
+
+# Count the occurrences of each tag
+tag_counts <- t_df %>%
+  group_by(Topics) %>%
+  summarize(count = n()) %>%
+  arrange(desc(count)) %>%
+  top_n(10)
+
+
+# Create a bar chart
+ggplot(tag_counts, aes(x = fct_reorder(Topics, count), y = count)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  labs(x = "Topics", y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("Most Popular Topic Tags")
 
 ####################################################
 # 3.XX Web scraping extra if the other shizzle works #
@@ -202,4 +221,5 @@ cleaned_repos <- str_trim(repos)
 
 # Print the cleaned top 10 trending repository titles
 head(cleaned_repos, 10)
+
 
