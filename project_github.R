@@ -25,7 +25,7 @@ install.packages("tidyr")
 install.packages("tidyverse")
 install.packages("rvest")
 install.packages("stringr")
-
+install.packages("forecast")
 
 
 
@@ -43,6 +43,8 @@ library(tidyverse)
 library(rvest)
 library(magrittr)
 library(stringr)
+library(forcats)
+
 
 #################
 # 1. Read data  #
@@ -70,20 +72,20 @@ i_df <- read_excel(temp_file)
 ############################################
 
 # sorting the dataframe desc based on star value. By doing this we get the most likes repositories
-f_df <- i_df %>%
+s_df <- i_df %>%
   arrange(desc(i_df$Stars))
 
 # only take the first 100 values 
-f_df <- f_df %>%
+s_df <- s_df %>%
   slice(1:100)
 
 
 #drop column which don't contain a language value
-f_df <- f_df %>% drop_na(Language)
+s_df <- s_df %>% drop_na(Language)
 
 
 # Create a bar plot of most Popular GitHub Repositories by Language
-ggplot(f_df, aes(x = Language)) +
+ggplot(s_df, aes(x = Language)) +
   geom_bar(fill = "red") +
   labs(title = "Most Popular GitHub Repositories by Language",
        x = "Language",
@@ -92,9 +94,27 @@ ggplot(f_df, aes(x = Language)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
-#########################################
-# 3.1 Repository most downloaded (fork) #
-#########################################
+z##########################################
+# 3.2 Repositories most downloaded (fork) #
+###########################################
+
+f_df <- i_df %>%
+  arrange(desc(i_df$Forks))
+
+f_df <- s_df %>%
+  slice(1:5)
+
+# Reorder following the value of another column:
+f_df %>%
+  mutate(Name = fct_reorder(Name, Forks)) %>%
+  ggplot( aes(x=Name, y=Forks)) +
+  geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+  coord_flip() +
+  xlab("") +
+  theme_bw()
+
+
+
 
 # Remove the temporary file
 unlink(temp_file)
@@ -124,7 +144,6 @@ cleaned_repos <- str_trim(repos)
 
 # Print the cleaned top 10 trending repository titles
 head(cleaned_repos, 10)
-
 
 
 
