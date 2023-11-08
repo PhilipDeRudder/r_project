@@ -159,6 +159,25 @@ unlink(temp_file)
 
 
 
+##########################################
+# 3.4 Relationship between star and fork #
+##########################################
+
+# Create a scatter plot
+ggplot(i_df, aes(x = Stars, y = Forks)) +
+  geom_point(color = "blue") +
+  labs(x = "Stars", y = "Forks") +
+  theme_minimal() +
+  ggtitle("Relationship Between Stars and Forks for GitHub Repositories")
+
+
+# Create a scatter plot with a regression line
+ggplot(i_df, aes(x = Stars, y = Forks)) +
+  geom_point(color = "blue") +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(x = "Stars", y = "Forks") +
+  theme_minimal() +
+  ggtitle("Scatter Plot with Regression Line")
 
 
 
@@ -183,5 +202,4 @@ cleaned_repos <- str_trim(repos)
 
 # Print the cleaned top 10 trending repository titles
 head(cleaned_repos, 10)
-
 
