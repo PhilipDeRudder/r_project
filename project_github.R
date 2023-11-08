@@ -30,6 +30,7 @@ install.packages("forecast")
 
 
 
+
 #################
 # LIBRARIES     #
 #################
@@ -64,14 +65,14 @@ i_df <- read_excel(temp_file)
 
 
 ###################################
-# 3. Analysis of top repositories #
+# 2. Analysis of top repositories #
 ###################################
 
-############################################
-# 3.1 Language most used by top 1000 repos #
-############################################
+##########################################################
+# 2.1 Most popular languages in the top 100 repositories #
+##########################################################
 
-# sorting the dataframe desc based on star value. By doing this we get the most likes repositories
+# sorting the dataframe desc based on star value. By doing this we get the most liked repositories
 s_df <- i_df %>%
   arrange(desc(i_df$Stars))
 
@@ -94,27 +95,62 @@ ggplot(s_df, aes(x = Language)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
-z##########################################
+###########################################
 # 3.2 Repositories most downloaded (fork) #
 ###########################################
 
+colors <- cut(f_df$Forks,
+                     breaks = c(0, 25000, 50000, 75000, Inf),
+                     labels = c("blue", "orange", "green", "red"))
+
+
+
+# sorting the dataframe desc based on fork value. By doing this we get the most liked repositories
 f_df <- i_df %>%
   arrange(desc(i_df$Forks))
 
 f_df <- s_df %>%
-  slice(1:5)
+  slice(1:20)
 
 # Reorder following the value of another column:
 f_df %>%
   mutate(Name = fct_reorder(Name, Forks)) %>%
-  ggplot( aes(x=Name, y=Forks)) +
-  geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+  ggplot( aes(x=Name, y=Forks, fill= colors)) +
+  geom_bar(stat="identity", alpha=.6, width=.4) +
+  scale_fill_manual(
+    values = c("blue" = "blue", "orange" = "orange", "green" = "#33FF33", "red" = "red"),
+    labels = c("0-25,000", "25,001-50,000", "50,001-75,000", "Above 75,000")
+  ) +
+  labs(title = "Most Popular GitHub Repositories by Forks",
+       x = "Repository name",
+       y = "Forks") +
   coord_flip() +
   xlab("") +
   theme_bw()
 
 
 
+
+################################################
+# 3.3 Amount of repositories created each year #
+################################################
+
+#convert created at column to date type
+i_df$`Created At` <- as.Date(i_df$`Created At`)
+#extracting the year from date time
+i_df$'Year' <- format(i_df$`Created At`,"%Y")
+
+
+
+
+# Create a bar plot of most Popular GitHub Repositories by Language
+ggplot(i_df, aes(x = Year)) +
+  geom_bar(fill = "red") +
+  labs(title = "Amount of repositories created each year",
+       x = "Year",
+       y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # Remove the temporary file
 unlink(temp_file)
@@ -124,8 +160,11 @@ unlink(temp_file)
 
 
 
+
+
+
 ####################################################
-# 3.XX Webscraping extra if the other shizzle works #
+# 3.XX Web scraping extra if the other shizzle works #
 ####################################################
 
 # Define the URL of the GitHub Trending page
@@ -144,22 +183,5 @@ cleaned_repos <- str_trim(repos)
 
 # Print the cleaned top 10 trending repository titles
 head(cleaned_repos, 10)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
